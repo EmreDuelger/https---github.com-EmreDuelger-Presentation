@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="de">
+	<head>
+		<meta charset="utf-8">
+
+		<title>KI-Agenten - Eine Einführung</title>
+
+		<meta name="description" content="Eine Präsentation über KI-Agenten: Was sie sind, wie sie funktionieren und wohin die Reise geht">
+		<meta name="author" content="Emre Dülger">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/moon.css" id="theme">
+
+		<!-- Code syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+
+		<style>
+			.reveal .agent-diagram {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				gap: 20px;
+				margin: 30px 0;
+			}
+			.reveal .agent-box {
+				background: rgba(255,255,255,0.1);
+				border: 2px solid #268bd2;
+				border-radius: 10px;
+				padding: 15px 25px;
+				text-align: center;
+				font-size: 0.7em;
+			}
+			.reveal .agent-arrow {
+				font-size: 2em;
+				color: #268bd2;
+			}
+			.reveal .comparison-table {
+				font-size: 0.6em;
+				border-collapse: collapse;
+				margin: 0 auto;
+			}
+			.reveal .comparison-table th,
+			.reveal .comparison-table td {
+				border: 1px solid #555;
+				padding: 10px 20px;
+				text-align: left;
+			}
+			.reveal .comparison-table th {
+				background: rgba(38,139,210,0.3);
+			}
+			.reveal .highlight-blue {
+				color: #268bd2;
+			}
+			.reveal .highlight-green {
+				color: #2aa198;
+			}
+			.reveal .highlight-red {
+				color: #dc322f;
+			}
+			.reveal .small-text {
+				font-size: 0.6em;
+				color: #888;
+			}
+		</style>
+	</head>
+
+	<body>
+
+	<div class="reveal">
+		<div class="slides">
+
+			<!-- Titelfolie -->
+			<section>
+				<h1 class="highlight-blue">KI-Agenten</h1>
+				<h3>Intelligente Systeme, die selbstständig handeln</h3>
+				<p>
+					<small>Erstellt von <a>Emre Dülger</a></small>
+				</p>
+			</section>
+
+			<!-- Agenda -->
+			<section>
+				<h2>Agenda</h2>
+				<ol>
+					<li>Was sind KI-Agenten?</li>
+					<li>Wie funktionieren sie?</li>
+					<li>Typen von Agenten</li>
+					<li>Agenten in der Praxis</li>
+					<li>Herausforderungen &amp; Ausblick</li>
+				</ol>
+			</section>
+
+			<!-- Was sind KI-Agenten? -->
+			<section>
+				<section>
+					<h2>Was sind KI-Agenten?</h2>
+					<h3>Definition</h3>
+					<ul>
+						<li>Software-Systeme, die ihre <strong>Umgebung wahrnehmen</strong> und <strong>autonom handeln</strong></li>
+						<li>Sie verfolgen <strong>Ziele</strong> und treffen eigenständig Entscheidungen</li>
+						<li>Können mit <strong>Tools</strong>, <strong>APIs</strong> und <strong>anderen Agenten</strong> interagieren</li>
+						<li>Gehen über einfache Eingabe-Ausgabe-Modelle hinaus</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>Agent vs. Chatbot</h2>
+					<table class="comparison-table">
+						<tr>
+							<th>Eigenschaft</th>
+							<th>Chatbot</th>
+							<th>Agent</th>
+						</tr>
+						<tr>
+							<td>Interaktion</td>
+							<td>Frage &rarr; Antwort</td>
+							<td>Ziel &rarr; Plan &rarr; Ausführung</td>
+						</tr>
+						<tr>
+							<td>Autonomie</td>
+							<td>Reagiert nur auf Input</td>
+							<td>Handelt eigenständig</td>
+						</tr>
+						<tr>
+							<td>Tools</td>
+							<td>Keine oder begrenzt</td>
+							<td>Nutzt externe Tools aktiv</td>
+						</tr>
+						<tr>
+							<td>Planung</td>
+							<td>Keine</td>
+							<td>Erstellt und verfolgt Pläne</td>
+						</tr>
+						<tr>
+							<td>Gedächtnis</td>
+							<td>Kurzfristig (Kontext)</td>
+							<td>Lang- und kurzfristig</td>
+						</tr>
+					</table>
+				</section>
+			</section>
+
+			<!-- Wie funktionieren sie? -->
+			<section>
+				<section>
+					<h2>Wie funktionieren KI-Agenten?</h2>
+					<h3>Der Agent-Loop</h3>
+					<div class="agent-diagram">
+						<div class="agent-box">
+							<strong>Wahrnehmen</strong><br>
+							Eingabe / Umgebung<br>analysieren
+						</div>
+						<div class="agent-arrow">&rarr;</div>
+						<div class="agent-box">
+							<strong>Denken</strong><br>
+							Planen /<br>Entscheiden
+						</div>
+						<div class="agent-arrow">&rarr;</div>
+						<div class="agent-box">
+							<strong>Handeln</strong><br>
+							Tool aufrufen /<br>Ausgabe erzeugen
+						</div>
+					</div>
+					<p class="small-text">Dieser Kreislauf wiederholt sich, bis das Ziel erreicht ist.</p>
+				</section>
+
+				<section>
+					<h2>Kernkomponenten</h2>
+					<ul>
+						<li><span class="highlight-blue">LLM (Large Language Model)</span> - Das "Gehirn" des Agenten</li>
+						<li><span class="highlight-green">Tools / Funktionen</span> - Ermöglichen Interaktion mit der Außenwelt</li>
+						<li><span class="highlight-blue">Gedächtnis</span> - Speichert Kontext und Erfahrungen</li>
+						<li><span class="highlight-green">Planung</span> - Zerlegt komplexe Aufgaben in Schritte</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>Beispiel: Tool-Nutzung</h2>
+<pre><code data-trim contenteditable>
+// Agent erhält Aufgabe: "Wie ist das Wetter in Berlin?"
+
+// Schritt 1: Agent erkennt - ich brauche ein Tool
+agent.think("Ich muss die Wetter-API aufrufen")
+
+// Schritt 2: Agent ruft Tool auf
+const wetter = await tools.wetterAPI("Berlin")
+// => { temp: 12, zustand: "bewölkt" }
+
+// Schritt 3: Agent formuliert Antwort
+agent.respond("In Berlin sind es 12°C und bewölkt.")
+</code></pre>
+				</section>
+			</section>
+
+			<!-- Typen von Agenten -->
+			<section>
+				<section>
+					<h2>Typen von KI-Agenten</h2>
+					<ul>
+						<li><strong>Einfache Reflex-Agenten</strong> - Reagieren direkt auf Eingaben nach festen Regeln</li>
+						<li><strong>Modellbasierte Agenten</strong> - Haben ein internes Modell der Welt</li>
+						<li><strong>Zielbasierte Agenten</strong> - Verfolgen definierte Ziele</li>
+						<li><strong>Lernende Agenten</strong> - Verbessern sich durch Erfahrung</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>Multi-Agenten-Systeme</h2>
+					<ul>
+						<li>Mehrere Agenten arbeiten <strong>zusammen</strong> an einer Aufgabe</li>
+						<li>Jeder Agent hat eine <strong>spezialisierte Rolle</strong></li>
+						<li>Kommunikation und <strong>Koordination</strong> zwischen Agenten</li>
+					</ul>
+					<div class="agent-diagram" style="margin-top: 30px;">
+						<div class="agent-box">
+							<strong>Planer</strong><br>
+							Strategie
+						</div>
+						<div class="agent-arrow">&harr;</div>
+						<div class="agent-box">
+							<strong>Researcher</strong><br>
+							Informationen
+						</div>
+						<div class="agent-arrow">&harr;</div>
+						<div class="agent-box">
+							<strong>Coder</strong><br>
+							Implementierung
+						</div>
+						<div class="agent-arrow">&harr;</div>
+						<div class="agent-box">
+							<strong>Reviewer</strong><br>
+							Qualität
+						</div>
+					</div>
+				</section>
+			</section>
+
+			<!-- Agenten in der Praxis -->
+			<section>
+				<section>
+					<h2>Agenten in der Praxis</h2>
+					<h3>Bekannte Beispiele</h3>
+					<ul>
+						<li><span class="highlight-blue">Claude Code</span> - Programmiert autonom, nutzt Terminal und Dateisystem</li>
+						<li><span class="highlight-green">Cursor / GitHub Copilot</span> - KI-gestützte Code-Editoren</li>
+						<li><span class="highlight-blue">Devin</span> - Autonomer Software-Entwickler</li>
+						<li><span class="highlight-green">AutoGPT</span> - Allgemeiner autonomer Agent</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>Anwendungsbereiche</h2>
+					<ul>
+						<li><strong>Software-Entwicklung</strong> - Code schreiben, testen, deployen</li>
+						<li><strong>Datenanalyse</strong> - Daten sammeln, auswerten, visualisieren</li>
+						<li><strong>Kundenservice</strong> - Anfragen bearbeiten, Probleme lösen</li>
+						<li><strong>Forschung</strong> - Literatur durchsuchen, zusammenfassen</li>
+						<li><strong>Workflow-Automatisierung</strong> - Komplexe Geschäftsprozesse</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>Architektur-Pattern</h2>
+<pre><code data-trim contenteditable>
+// ReAct Pattern (Reason + Act)
+while (!zielErreicht) {
+  // 1. Beobachten
+  const beobachtung = await agent.observe(umgebung);
+
+  // 2. Nachdenken (Reason)
+  const gedanke = await llm.reason(beobachtung, ziel);
+
+  // 3. Handeln (Act)
+  const aktion = await agent.act(gedanke);
+
+  // 4. Ergebnis auswerten
+  zielErreicht = await agent.evaluate(aktion);
+}
+</code></pre>
+					<p class="small-text">ReAct kombiniert Reasoning mit Action in einem iterativen Loop.</p>
+				</section>
+			</section>
+
+			<!-- Herausforderungen & Ausblick -->
+			<section>
+				<section>
+					<h2>Herausforderungen</h2>
+					<ul>
+						<li class="highlight-red"><strong>Halluzinationen</strong> - Agenten können falsche Informationen generieren</li>
+						<li class="highlight-red"><strong>Sicherheit</strong> - Autonome Systeme brauchen Grenzen</li>
+						<li class="highlight-red"><strong>Zuverlässigkeit</strong> - Fehler können sich kaskadieren</li>
+						<li class="highlight-red"><strong>Kosten</strong> - Viele LLM-Aufrufe werden teuer</li>
+						<li class="highlight-red"><strong>Kontrolle</strong> - Balance zwischen Autonomie und Aufsicht</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>Ausblick</h2>
+					<ul>
+						<li>Agenten werden <strong>zuverlässiger</strong> und <strong>kostengünstiger</strong></li>
+						<li><strong>Spezialisierte Agenten</strong> für verschiedene Domänen</li>
+						<li>Bessere <strong>Zusammenarbeit</strong> zwischen Mensch und Agent</li>
+						<li><strong>Standardisierte Protokolle</strong> für Agent-zu-Agent-Kommunikation</li>
+						<li>Integration in <strong>bestehende Workflows</strong> und Tools</li>
+					</ul>
+				</section>
+			</section>
+
+			<!-- Zusammenfassung -->
+			<section>
+				<h2>Zusammenfassung</h2>
+				<ul>
+					<li>KI-Agenten sind <strong>autonome Systeme</strong>, die Ziele verfolgen</li>
+					<li>Sie kombinieren <strong>LLMs</strong> mit <strong>Tools</strong> und <strong>Planung</strong></li>
+					<li>Der <strong>Agent-Loop</strong> (Wahrnehmen, Denken, Handeln) ist das Kernprinzip</li>
+					<li>Praxiseinsatz wächst rasant: <strong>Coding, Analyse, Automatisierung</strong></li>
+					<li>Herausforderungen bleiben: <strong>Sicherheit, Kosten, Kontrolle</strong></li>
+				</ul>
+				<br>
+				<p class="highlight-blue" style="font-size: 1.2em;"><strong>Die Zukunft gehört den Agenten.</strong></p>
+			</section>
+
+			<!-- Danke -->
+			<section>
+				<h1>Vielen Dank!</h1>
+				<h3>Fragen?</h3>
+				<p>
+					<small>Emre Dülger</small>
+				</p>
+			</section>
+
+		</div>
+	</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				transition: 'convex',
+
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, condition: function() { return !!document.querySelector( 'pre code' ); }, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true },
+					{ src: 'plugin/notes/notes.js', async: true }
+				]
+			});
+		</script>
+
+	</body>
+</html>
