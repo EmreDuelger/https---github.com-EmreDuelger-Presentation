@@ -251,6 +251,28 @@ agent.respond("In Berlin sind es 12°C und bewölkt.")
 						</div>
 					</div>
 				</section>
+
+				<section>
+					<h2>Praxis-Beispiel</h2>
+					<h3>Diese Präsentation wurde mit einem<br>Multi-Agenten-System erstellt</h3>
+					<div class="agent-diagram" style="margin-top: 40px;">
+						<div class="agent-box" style="border-color: #2aa198;">
+							<strong class="highlight-green">Entwickler-Agent</strong><br>
+							Erstellt &amp; verbessert<br>die Präsentation
+						</div>
+						<div class="agent-arrow">&rarr;</div>
+						<div class="agent-box" style="border-color: #268bd2;">
+							<strong class="highlight-blue">Review-Agent</strong><br>
+							Prüft Qualität<br>&amp; gibt Feedback
+						</div>
+						<div class="agent-arrow">&rarr;</div>
+						<div class="agent-box" style="border-color: #b58900;">
+							<strong style="color: #b58900;">Deployment-Agent</strong><br>
+							Veröffentlicht<br>das Ergebnis
+						</div>
+					</div>
+					<p class="small-text">Jeder Agent hat eine spezialisierte Rolle - zusammen liefern sie das Endergebnis.</p>
+				</section>
 			</section>
 
 			<!-- Agenten in der Praxis -->
@@ -263,6 +285,7 @@ agent.respond("In Berlin sind es 12°C und bewölkt.")
 						<li><span class="highlight-green">Cursor / GitHub Copilot</span> - KI-gestützte Code-Editoren</li>
 						<li><span class="highlight-blue">Devin</span> - Autonomer Software-Entwickler</li>
 						<li><span class="highlight-green">AutoGPT</span> - Allgemeiner autonomer Agent</li>
+						<li><span class="highlight-blue">MCP (Model Context Protocol)</span> - Standardisiertes Protokoll für Tool-Nutzung durch Agenten</li>
 					</ul>
 				</section>
 
@@ -297,6 +320,18 @@ while (!zielErreicht) {
 </code></pre>
 					<p class="small-text">ReAct kombiniert Reasoning mit Action in einem iterativen Loop.</p>
 				</section>
+			</section>
+
+			<!-- Frameworks für Agenten -->
+			<section>
+				<h2>Frameworks für Agenten</h2>
+				<ul>
+					<li><span class="highlight-blue">LangChain</span> - Modulares Framework zum Bauen von LLM-Anwendungen und Agenten</li>
+					<li><span class="highlight-green">CrewAI</span> - Framework für kollaborative Multi-Agenten-Systeme mit Rollenverteilung</li>
+					<li><span class="highlight-blue">AutoGen</span> - Microsofts Framework für konversationsbasierte Multi-Agenten-Workflows</li>
+					<li><span class="highlight-green">Claude Agent SDK</span> - Anthropics SDK zum Erstellen von Agenten mit Claude als Basis-Modell</li>
+				</ul>
+				<p class="small-text">Die Wahl des Frameworks hängt vom Anwendungsfall und der gewünschten Architektur ab.</p>
 			</section>
 
 			<!-- Herausforderungen & Ausblick -->
