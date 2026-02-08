@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emre's Präsentationen</title>
+    <meta name="author" content="Emre Dülger">
+    <meta name="description" content="Übersicht der Präsentationen von Emre Dülger">
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #002b36;
+            color: #93a1a1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        header h1 {
+            font-size: 2.4rem;
+            font-weight: 300;
+            color: #eee8d5;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            color: #6c7a89;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 820px;
+            width: 100%;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 2rem;
+            transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(147, 161, 161, 0.3);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-icon {
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .card h2 {
+            font-size: 1.35rem;
+            font-weight: 600;
+            color: #eee8d5;
+            margin-bottom: 0.75rem;
+        }
+
+        .card p {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #839496;
+            flex-grow: 1;
+        }
+
+        .card .label {
+            display: inline-block;
+            margin-top: 1.25rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #268bd2;
+        }
+
+        footer {
+            margin-top: 3rem;
+            text-align: center;
+            font-size: 0.85rem;
+            color: #586e75;
+        }
+
+        @media (max-width: 680px) {
+            header h1 {
+                font-size: 1.8rem;
+            }
+
+            .cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Emre's Präsentationen</h1>
+        <p>Emre Dülger</p>
+    </header>
+
+    <div class="cards">
+        <a class="card" href="EmresPräsentationMitReveal.js/index.html">
+            <div class="card-icon">&#x1F310;</div>
+            <h2>Das Document Object Model</h2>
+            <p>Eine interaktive Präsentation über das DOM: Wie Webseiten strukturiert sind und wie man sie mit JavaScript dynamisch verändern kann.</p>
+            <span class="label">Präsentation öffnen &rarr;</span>
+        </a>
+
+        <a class="card" href="EmresPräsentationMitReveal.js/agenten.html">
+            <div class="card-icon">&#x1F916;</div>
+            <h2>KI-Agenten &ndash; Eine Einführung</h2>
+            <p>Was sind KI-Agenten, wie funktionieren sie und wohin geht die Reise? Ein Überblick über autonome intelligente Systeme.</p>
+            <span class="label">Präsentation öffnen &rarr;</span>
+        </a>
+    </div>
+
+    <footer>
+        &copy; 2025 Emre Dülger
+    </footer>
+</body>
+</html>
