@@ -1,4 +1,4 @@
-name: Auto PR erstellen
+name: Auto PR erstellen + Auto-Merge aktivieren
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
       - 'dependabot/**'
 
 permissions:
-  contents: read
+  contents: write
   pull-requests: write
 
 jobs:
@@ -24,11 +24,17 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          EXISTING=$(gh pr list --head "${{ github.ref_name }}" --state open --json number --jq 'length')
-          echo "existing=$EXISTING" >> "$GITHUB_OUTPUT"
+          PR_URL=$(gh pr list --head "${{ github.ref_name }}" --state open --json url --jq '.[0].url // empty')
+          echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
+          if [ -n "$PR_URL" ]; then
+            echo "existing=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "existing=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: PR erstellen
-        if: steps.check.outputs.existing == '0'
+        id: create
+        if: steps.check.outputs.existing == 'false'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -41,14 +47,34 @@ jobs:
           BODY="$BODY\n\n### Commits\n$COMMITS"
           BODY="$BODY\n\n### Pipeline"
           BODY="$BODY\n- [ ] CI-Agent: HTML-Validierung + Link-Check"
-          BODY="$BODY\n- [ ] Auto-Merge nach bestandenen Checks"
+          BODY="$BODY\n- [ ] Auto-Merge sobald Branch Protection Rules erfuellt"
           BODY="$BODY\n- [ ] Pages-Deploy nach Merge"
 
           echo -e "$BODY" > /tmp/pr-body.md
 
-          gh pr create \
+          PR_URL=$(gh pr create \
             --base master \
             --title "$TITLE" \
-            --body-file /tmp/pr-body.md
+            --body-file /tmp/pr-body.md 2>&1 | tail -1)
 
-          echo "PR erstellt fuer Branch: $BRANCH"
+          echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
+          echo "PR erstellt: $PR_URL"
+
+      - name: Auto-Merge aktivieren
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # PR-URL ermitteln (neu erstellt oder bereits vorhanden)
+          PR_URL="${{ steps.create.outputs.pr_url || steps.check.outputs.pr_url }}"
+
+          if [ -z "$PR_URL" ]; then
+            echo "Keine PR-URL gefunden, ueberspringe Auto-Merge"
+            exit 0
+          fi
+
+          # Auto-Merge aktivieren - GitHub merged automatisch
+          # sobald alle Branch Protection Rules erfuellt sind
+          gh pr merge "$PR_URL" --auto --squash
+
+          echo "Auto-Merge aktiviert fuer: $PR_URL"
+          echo "GitHub merged automatisch sobald alle Checks bestanden sind."

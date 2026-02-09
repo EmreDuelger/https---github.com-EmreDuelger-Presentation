@@ -7,12 +7,13 @@ Dieses Projekt nutzt ein Multi-Agenten-System. Jeder Agent hat eine klar definie
 ## Übersicht
 
 ```
-Push auf Branch ──► PR erstellt ──► CI prüft ──► Auto-Merge ──► Pages Deploy
-     [1]              [4]           [5+6]          [7]            [8]
-  Claude Code      create-pr.yml   ci.yml    auto-merge.yml  deploy-pages.yml
+Push auf Branch ──► PR + Auto-Merge ──► CI prüft ──► GitHub merged ──► Pages Deploy
+     [1]                [4]               [5]        (Branch Protection)      [6]
+  Claude Code      create-pr.yml        ci.yml       gh pr merge --auto   deploy-pages.yml
 ```
 
 Alle Schritte laufen **vollautomatisch** - kein Human-in-the-Loop.
+Auto-Merge respektiert **Branch Protection Rules** - GitHub merged erst wenn alle Regeln erfüllt sind.
 
 ---
 
@@ -87,20 +88,29 @@ cat CLAUDE.md  # falls vorhanden
 
 ---
 
-## Agent 4: PR-Agent (GitHub Actions)
+## Agent 4: PR- und Auto-Merge-Agent (GitHub Actions)
 
 | Eigenschaft | Wert |
 |-------------|------|
 | **Plattform** | GitHub Actions |
 | **Trigger** | `push` auf `claude/**` oder `dependabot/**` Branches |
-| **Aufgabe** | Automatisch Pull Request erstellen |
+| **Aufgabe** | PR erstellen + Auto-Merge aktivieren |
 | **Konfiguration** | `.github/workflows/create-pr.yml` |
+| **Merge-Methode** | Squash Merge |
 
 ### Was er macht
 1. Erkennt Push auf einen `claude/*` oder `dependabot/*` Branch
 2. Prüft ob bereits ein offener PR für diesen Branch existiert
-3. Falls nein: Sammelt alle Commits seit `master`
-4. Erstellt automatisch einen PR mit Titel (aus Branch-Name) und Commit-Liste
+3. Falls nein: Sammelt alle Commits seit `master` und erstellt PR
+4. Aktiviert **`gh pr merge --auto --squash`** auf dem PR
+5. GitHub merged den PR **automatisch** sobald alle Branch Protection Rules erfüllt sind
+
+### Warum `gh pr merge --auto`?
+Im Gegensatz zu einem direkten Merge (`pulls.merge` API) respektiert `--auto` die **Branch Protection Rules**:
+- Wartet auf required Status Checks (CI muss grün sein)
+- Wartet auf required Reviews (falls konfiguriert)
+- Wartet auf alle weiteren Branch Protection Regeln
+- Merged erst wenn **alles** erfüllt ist
 
 ### Wo konfiguriert
 ```
@@ -111,14 +121,15 @@ cat CLAUDE.md  # falls vorhanden
 ```bash
 cat .github/workflows/create-pr.yml
 
-# Auf GitHub: Actions Tab → "Auto PR erstellen"
+# Auf GitHub: Actions Tab → "Auto PR erstellen + Auto-Merge aktivieren"
+# Pull Requests Tab → "Auto-merge" Badge zeigt Status
 ```
 
 ### Permissions
 ```yaml
 permissions:
-  contents: read
-  pull-requests: write
+  contents: write        # für Auto-Merge
+  pull-requests: write   # für PR-Erstellung
 ```
 
 ---
@@ -145,6 +156,9 @@ permissions:
 - Meldet kaputte Links (nicht blockierend)
 - Listet Dateigrößen aller HTML-Dateien auf
 
+### Zusammenspiel mit Branch Protection
+Wenn in den Branch Protection Rules `validate` und/oder `review` als **required Status Checks** konfiguriert sind, wartet der Auto-Merge-Agent (Agent 4) automatisch bis diese Jobs bestanden haben.
+
 ### Wo konfiguriert
 ```
 .github/workflows/ci.yml
@@ -152,7 +166,6 @@ permissions:
 
 ### So inspizierst du die Einstellungen
 ```bash
-# Workflow-Datei lesen
 cat .github/workflows/ci.yml
 
 # Auf GitHub: Actions Tab → "CI - HTML Validierung & Review"
@@ -168,52 +181,7 @@ permissions:
 
 ---
 
-## Agent 6: Auto-Merge-Agent (GitHub Actions)
-
-| Eigenschaft | Wert |
-|-------------|------|
-| **Plattform** | GitHub Actions |
-| **Trigger** | `check_suite` completed + `pull_request_review` submitted |
-| **Aufgabe** | PRs automatisch mergen wenn alle Checks bestanden |
-| **Konfiguration** | `.github/workflows/auto-merge.yml` |
-| **Merge-Methode** | Squash Merge |
-
-### Was er macht
-1. Wartet bis eine `check_suite` mit `conclusion: success` eintrifft
-2. Listet alle offenen PRs auf
-3. Filtert: Nur PRs von `claude/*` oder `dependabot/*` Branches
-4. Prüft: Sind alle Check-Runs `success` oder `skipped`?
-5. Wenn ja: Squash-Merge in master
-
-### Sicherheitsmechanismen
-- Merged **nur** PRs von Bot-Branches (`claude/*`, `dependabot/*`)
-- Manuelle PRs (z.B. `feature/xyz`) werden **nicht** auto-gemerged
-- Alle CI-Checks müssen bestanden sein
-
-### Wo konfiguriert
-```
-.github/workflows/auto-merge.yml
-```
-
-### So inspizierst du die Einstellungen
-```bash
-# Workflow-Datei lesen
-cat .github/workflows/auto-merge.yml
-
-# Auf GitHub: Actions Tab → "Auto-Merge nach CI"
-# Dort siehst du welche PRs gemerged/übersprungen wurden
-```
-
-### Permissions
-```yaml
-permissions:
-  contents: write       # zum Mergen
-  pull-requests: write  # zum Lesen der PRs
-```
-
----
-
-## Agent 7: Pages-Deploy-Agent (GitHub Actions)
+## Agent 6: Pages-Deploy-Agent (GitHub Actions)
 
 | Eigenschaft | Wert |
 |-------------|------|
@@ -236,7 +204,6 @@ permissions:
 
 ### So inspizierst du die Einstellungen
 ```bash
-# Workflow-Datei lesen
 cat .github/workflows/deploy-pages.yml
 
 # Auf GitHub: Actions Tab → "Deploy GitHub Pages"
@@ -251,21 +218,9 @@ permissions:
   id-token: write
 ```
 
-### Voraussetzung
-In den GitHub Repo Settings muss aktiviert sein:
-- **Settings > Pages > Source**: "GitHub Actions" (nicht "Deploy from a branch")
-
 ---
 
 ## Optionale Agenten (externe Dienste)
-
-### GitHub Copilot (PR-Beschreibung)
-| Eigenschaft | Wert |
-|-------------|------|
-| **Plattform** | GitHub.com |
-| **Trigger** | PR-Erstellung |
-| **Aufgabe** | Schlägt automatisch PR-Titel und -Beschreibung vor |
-| **Aktivierung** | Wird von GitHub automatisch angeboten wenn Copilot aktiv ist |
 
 ### CodeRabbit (Code-Review)
 | Eigenschaft | Wert |
@@ -275,6 +230,51 @@ In den GitHub Repo Settings muss aktiviert sein:
 | **Aufgabe** | Tiefgehendes KI-Code-Review mit Inline-Kommentaren |
 | **Aktivierung** | [coderabbit.ai](https://coderabbit.ai) installieren und Repo auswählen |
 | **Konfiguration** | Optional: `.coderabbit.yaml` im Repo-Root |
+
+---
+
+## Branch Protection Setup
+
+Damit die Pipeline korrekt funktioniert, muss **Branch Protection** auf `master` konfiguriert sein.
+
+### Einrichtung: Settings > Branches > Branch protection rules > Add rule
+
+| Einstellung | Wert | Warum |
+|-------------|------|-------|
+| **Branch name pattern** | `master` | Schützt den Hauptbranch |
+| **Require a pull request before merging** | Aktiviert | Kein direkter Push auf master |
+| **Require status checks to pass** | Aktiviert | CI muss grün sein vor Merge |
+| **Status checks that are required** | `HTML Validierung`, `Automatisches Review` | Die Job-Namen aus `ci.yml` |
+| **Require branches to be up to date** | Optional | Stellt sicher, dass Branch aktuell ist |
+| **Do not allow bypassing** | Optional | Gilt auch für Admins |
+
+### Einrichtung: Settings > General
+
+| Einstellung | Wert | Warum |
+|-------------|------|-------|
+| **Allow auto-merge** | Aktiviert | Damit `gh pr merge --auto` funktioniert |
+
+### Einrichtung: Settings > Actions > General
+
+| Einstellung | Wert | Warum |
+|-------------|------|-------|
+| **Workflow permissions** | Read and write permissions | Workflows können PRs erstellen und mergen |
+| **Allow GitHub Actions to create and approve pull requests** | Aktiviert | PR-Agent kann PRs erstellen |
+
+### Einrichtung: Settings > Pages
+
+| Einstellung | Wert | Warum |
+|-------------|------|-------|
+| **Source** | GitHub Actions | Deploy-Agent übernimmt das Deployment |
+
+### So prüfst du die Branch Protection
+```bash
+# Auf GitHub: Settings → Branches → Branch protection rules
+# Dort siehst du alle aktiven Regeln für master
+
+# Oder per API:
+gh api repos/{owner}/{repo}/branches/master/protection
+```
 
 ---
 
@@ -291,26 +291,33 @@ Du (Prompt)
 └──────────┬───────────────────────┘
            │ git push claude/*
            ▼
-┌──────────────────────────────────┐
-│  GitHub Actions                  │
-│  ├── PR-Agent (create-pr.yml)    │  Agent 4 ← erstellt PR automatisch
-│  ├── CI-Agent (ci.yml)           │  Agent 5 ← validiert HTML + Links
-│  ├── Auto-Merge (auto-merge.yml) │  Agent 6 ← merged wenn CI grün
-│  └── Pages-Deploy (deploy.yml)   │  Agent 7 ← deployt auf Pages
-└──────────┬───────────────────────┘
+┌──────────────────────────────────────────────┐
+│  GitHub Actions                              │
+│  ├── PR + Auto-Merge (create-pr.yml)         │  Agent 4
+│  │     └── gh pr merge --auto --squash       │
+│  ├── CI-Agent (ci.yml)                       │  Agent 5
+│  │     ├── HTML Validierung                  │
+│  │     └── Link-Check                        │
+│  └── Pages-Deploy (deploy-pages.yml)         │  Agent 6
+└──────────┬───────────────────────────────────┘
+           │
+           ▼
+┌──────────────────────────────────────────────┐
+│  Branch Protection (GitHub)                  │
+│  ├── Required status checks müssen bestehen  │
+│  ├── Auto-Merge wartet auf grünes Licht      │
+│  └── Merge → Push auf master → Deploy        │
+└──────────┬───────────────────────────────────┘
            │
            ▼
 ┌──────────────────────────────────┐
 │  GitHub Pages (Live)             │
 │  └── Präsentationen online       │
 └──────────────────────────────────┘
-
-Optional (externe Dienste):
-  ├── CodeRabbit → tiefes Code-Review
-  └── GitHub Copilot → PR-Beschreibung verbessern
 ```
 
 **Kein Human-in-the-Loop** - der gesamte Flow von Push bis Live-Seite ist vollautomatisch.
+Branch Protection stellt sicher, dass nur geprüfter Code auf master landet.
 
 ---
 
@@ -318,9 +325,8 @@ Optional (externe Dienste):
 
 | Datei | Agent | Beschreibung |
 |-------|-------|-------------|
-| `.github/workflows/create-pr.yml` | PR-Agent (#4) | Automatische PR-Erstellung |
+| `.github/workflows/create-pr.yml` | PR + Auto-Merge (#4) | PR erstellen + Auto-Merge aktivieren |
 | `.github/workflows/ci.yml` | CI-Agent (#5) | HTML-Validierung + Link-Check |
-| `.github/workflows/auto-merge.yml` | Auto-Merge-Agent (#6) | Squash-Merge nach bestandenen Checks |
-| `.github/workflows/deploy-pages.yml` | Pages-Deploy-Agent (#7) | Deployment auf GitHub Pages |
+| `.github/workflows/deploy-pages.yml` | Pages-Deploy-Agent (#6) | Deployment auf GitHub Pages |
 | `CLAUDE.md` (optional) | Entwickler-Agent (#1) | Projektspezifische Anweisungen für Claude |
 | `.coderabbit.yaml` (optional) | CodeRabbit | Review-Konfiguration |

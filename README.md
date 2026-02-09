@@ -32,11 +32,11 @@ Reveal.js Präsentationen mit vollautomatischer CI/CD Pipeline - gebaut mit eine
 
 ## Multi-Agenten-System
 
-Dieses Projekt wird von **7 Agenten vollautomatisch** betrieben - **kein Human-in-the-Loop**:
+Dieses Projekt wird von **6 Agenten vollautomatisch** betrieben - **kein Human-in-the-Loop**:
 
 ```
-Claude Code ──► git push ──► PR erstellt ──► CI prüft ──► Auto-Merge ──► Pages Deploy
-  [1-3]                        [4]            [5]           [6]             [7]
+Claude Code ──► git push ──► PR + Auto-Merge ──► CI prüft ──► GitHub merged ──► Pages Deploy
+  [1-3]              [4]                          [5]       (Branch Protection)       [6]
 ```
 
 | # | Agent | Plattform | Trigger | Konfiguration |
@@ -44,10 +44,11 @@ Claude Code ──► git push ──► PR erstellt ──► CI prüft ──�
 | 1 | Entwickler-Agent | Claude Code | Benutzer-Prompt | Per Prompt |
 | 2 | Review-Agent | Claude Code (Sub-Agent) | Vom Entwickler-Agent | Per Prompt |
 | 3 | Deployment-Agent | Claude Code (Sub-Agent) | Vom Entwickler-Agent | Per Prompt |
-| 4 | PR-Agent | GitHub Actions | Push auf `claude/*` | `.github/workflows/create-pr.yml` |
+| 4 | PR + Auto-Merge-Agent | GitHub Actions | Push auf `claude/*` | `.github/workflows/create-pr.yml` |
 | 5 | CI-Agent | GitHub Actions | PR geöffnet | `.github/workflows/ci.yml` |
-| 6 | Auto-Merge-Agent | GitHub Actions | CI bestanden | `.github/workflows/auto-merge.yml` |
-| 7 | Pages-Deploy-Agent | GitHub Actions | Push auf master | `.github/workflows/deploy-pages.yml` |
+| 6 | Pages-Deploy-Agent | GitHub Actions | Push auf master | `.github/workflows/deploy-pages.yml` |
+
+Auto-Merge nutzt `gh pr merge --auto` und respektiert **Branch Protection Rules** - siehe [AGENTS.md](AGENTS.md).
 
 Details zu jedem Agenten, ihren Triggern, Permissions und Inspektionsmöglichkeiten: siehe [AGENTS.md](AGENTS.md).
 
