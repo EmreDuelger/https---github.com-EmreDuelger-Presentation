@@ -8,8 +8,11 @@ Dieses Projekt nutzt ein Multi-Agenten-System. Jeder Agent hat eine klar definie
 
 ```
 Push auf Branch ──► PR erstellt ──► CI prüft ──► Auto-Merge ──► Pages Deploy
-     [1]              [2]           [3+4]          [5]            [6]
+     [1]              [4]           [5+6]          [7]            [8]
+  Claude Code      create-pr.yml   ci.yml    auto-merge.yml  deploy-pages.yml
 ```
+
+Alle Schritte laufen **vollautomatisch** - kein Human-in-the-Loop.
 
 ---
 
@@ -84,7 +87,43 @@ cat CLAUDE.md  # falls vorhanden
 
 ---
 
-## Agent 4: CI-Agent (GitHub Actions)
+## Agent 4: PR-Agent (GitHub Actions)
+
+| Eigenschaft | Wert |
+|-------------|------|
+| **Plattform** | GitHub Actions |
+| **Trigger** | `push` auf `claude/**` oder `dependabot/**` Branches |
+| **Aufgabe** | Automatisch Pull Request erstellen |
+| **Konfiguration** | `.github/workflows/create-pr.yml` |
+
+### Was er macht
+1. Erkennt Push auf einen `claude/*` oder `dependabot/*` Branch
+2. Prüft ob bereits ein offener PR für diesen Branch existiert
+3. Falls nein: Sammelt alle Commits seit `master`
+4. Erstellt automatisch einen PR mit Titel (aus Branch-Name) und Commit-Liste
+
+### Wo konfiguriert
+```
+.github/workflows/create-pr.yml
+```
+
+### So inspizierst du die Einstellungen
+```bash
+cat .github/workflows/create-pr.yml
+
+# Auf GitHub: Actions Tab → "Auto PR erstellen"
+```
+
+### Permissions
+```yaml
+permissions:
+  contents: read
+  pull-requests: write
+```
+
+---
+
+## Agent 5: CI-Agent (GitHub Actions)
 
 | Eigenschaft | Wert |
 |-------------|------|
@@ -129,7 +168,7 @@ permissions:
 
 ---
 
-## Agent 5: Auto-Merge-Agent (GitHub Actions)
+## Agent 6: Auto-Merge-Agent (GitHub Actions)
 
 | Eigenschaft | Wert |
 |-------------|------|
@@ -174,7 +213,7 @@ permissions:
 
 ---
 
-## Agent 6: Pages-Deploy-Agent (GitHub Actions)
+## Agent 7: Pages-Deploy-Agent (GitHub Actions)
 
 | Eigenschaft | Wert |
 |-------------|------|
@@ -246,19 +285,18 @@ Du (Prompt)
   │
   ▼
 ┌──────────────────────────────────┐
-│  Claude Code (Entwickler-Agent)  │
-│  ├── Review-Agent (Sub-Agent)    │
-│  └── Deployment-Agent (Sub-Agent)│
+│  Claude Code (Entwickler-Agent)  │  Agent 1
+│  ├── Review-Agent (Sub-Agent)    │  Agent 2
+│  └── Deployment-Agent (Sub-Agent)│  Agent 3
 └──────────┬───────────────────────┘
            │ git push claude/*
            ▼
 ┌──────────────────────────────────┐
-│  GitHub Repository               │
-│  ├── PR erstellt (Copilot)       │
-│  ├── CodeRabbit reviewt          │
-│  ├── CI-Agent prüft (.yml)       │
-│  ├── Auto-Merge-Agent (.yml)     │
-│  └── Pages-Deploy-Agent (.yml)   │
+│  GitHub Actions                  │
+│  ├── PR-Agent (create-pr.yml)    │  Agent 4 ← erstellt PR automatisch
+│  ├── CI-Agent (ci.yml)           │  Agent 5 ← validiert HTML + Links
+│  ├── Auto-Merge (auto-merge.yml) │  Agent 6 ← merged wenn CI grün
+│  └── Pages-Deploy (deploy.yml)   │  Agent 7 ← deployt auf Pages
 └──────────┬───────────────────────┘
            │
            ▼
@@ -266,7 +304,13 @@ Du (Prompt)
 │  GitHub Pages (Live)             │
 │  └── Präsentationen online       │
 └──────────────────────────────────┘
+
+Optional (externe Dienste):
+  ├── CodeRabbit → tiefes Code-Review
+  └── GitHub Copilot → PR-Beschreibung verbessern
 ```
+
+**Kein Human-in-the-Loop** - der gesamte Flow von Push bis Live-Seite ist vollautomatisch.
 
 ---
 
@@ -274,8 +318,9 @@ Du (Prompt)
 
 | Datei | Agent | Beschreibung |
 |-------|-------|-------------|
-| `.github/workflows/ci.yml` | CI-Agent | HTML-Validierung + Link-Check |
-| `.github/workflows/auto-merge.yml` | Auto-Merge-Agent | Squash-Merge nach bestandenen Checks |
-| `.github/workflows/deploy-pages.yml` | Pages-Deploy-Agent | Deployment auf GitHub Pages |
-| `CLAUDE.md` (optional) | Entwickler-Agent | Projektspezifische Anweisungen für Claude |
+| `.github/workflows/create-pr.yml` | PR-Agent (#4) | Automatische PR-Erstellung |
+| `.github/workflows/ci.yml` | CI-Agent (#5) | HTML-Validierung + Link-Check |
+| `.github/workflows/auto-merge.yml` | Auto-Merge-Agent (#6) | Squash-Merge nach bestandenen Checks |
+| `.github/workflows/deploy-pages.yml` | Pages-Deploy-Agent (#7) | Deployment auf GitHub Pages |
+| `CLAUDE.md` (optional) | Entwickler-Agent (#1) | Projektspezifische Anweisungen für Claude |
 | `.coderabbit.yaml` (optional) | CodeRabbit | Review-Konfiguration |

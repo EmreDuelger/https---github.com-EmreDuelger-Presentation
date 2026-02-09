@@ -1,0 +1,60 @@
+name: Auto PR erstellen
+
+on:
+  push:
+    branches:
+      - 'claude/**'
+      - 'dependabot/**'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  create-pr:
+    name: Pull Request erstellen
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Prüfe ob PR bereits existiert
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          EXISTING=$(gh pr list --head "${{ github.ref_name }}" --state open --json number --jq 'length')
+          echo "existing=$EXISTING" >> "$GITHUB_OUTPUT"
+
+      - name: PR erstellen
+        if: steps.check.outputs.existing == '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Commits seit master sammeln
+          COMMITS=$(git log origin/master..HEAD --pretty=format:"- %s" 2>/dev/null || echo "- Neue Änderungen")
+
+          # PR-Titel aus Branch-Name ableiten
+          BRANCH="${{ github.ref_name }}"
+          TITLE=$(echo "$BRANCH" | sed 's|claude/||' | sed 's|-| |g' | sed 's/\b\(.\)/\u\1/g')
+
+          gh pr create \
+            --base master \
+            --title "$TITLE" \
+            --body "$(cat <<EOF
+## Automatisch erstellter PR
+
+Branch: \`$BRANCH\`
+
+### Commits
+$COMMITS
+
+### Pipeline
+- [ ] CI-Agent: HTML-Validierung + Link-Check
+- [ ] Auto-Merge nach bestandenen Checks
+- [ ] Pages-Deploy nach Merge
+EOF
+)"
+
+          echo "PR erstellt für Branch: $BRANCH"
