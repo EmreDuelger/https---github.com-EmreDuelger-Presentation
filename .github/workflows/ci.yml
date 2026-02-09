@@ -1,0 +1,71 @@
+name: CI - HTML Validierung & Review
+
+on:
+  pull_request:
+    branches: [master, main]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  validate:
+    name: HTML Validierung
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install html-validate
+        run: npm install -g html-validate
+
+      - name: Validate HTML files
+        run: |
+          echo "## HTML Validierung" >> $GITHUB_STEP_SUMMARY
+          ERRORS=0
+          for file in $(find . -name "*.html" -not -path "./node_modules/*"); do
+            echo "Prüfe: $file"
+            if html-validate --formatter stylish "$file" 2>&1; then
+              echo "- ✅ \`$file\` - OK" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "- ⚠️ \`$file\` - Warnungen (nicht blockierend)" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
+          echo ""
+          echo "Validierung abgeschlossen." >> $GITHUB_STEP_SUMMARY
+
+  review:
+    name: Automatisches Review
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for broken links
+        run: |
+          echo "## Link-Check" >> $GITHUB_STEP_SUMMARY
+          BROKEN=0
+          for url in $(grep -roh 'https\?://[^"'"'"' <>]*' --include="*.html" . | sort -u); do
+            STATUS=$(curl -o /dev/null -s -w "%{http_code}" --max-time 10 "$url" 2>/dev/null || echo "000")
+            if [ "$STATUS" -ge 400 ] || [ "$STATUS" = "000" ]; then
+              echo "- ⚠️ \`$url\` → HTTP $STATUS" >> $GITHUB_STEP_SUMMARY
+              BROKEN=$((BROKEN + 1))
+            fi
+          done
+          if [ "$BROKEN" -eq 0 ]; then
+            echo "- ✅ Alle Links erreichbar" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- ⚠️ $BROKEN Link(s) nicht erreichbar (nicht blockierend)" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Check file sizes
+        run: |
+          echo "## Dateigrößen" >> $GITHUB_STEP_SUMMARY
+          for file in $(find . -name "*.html" -not -path "./node_modules/*"); do
+            SIZE=$(wc -c < "$file")
+            SIZE_KB=$((SIZE / 1024))
+            echo "- \`$file\` → ${SIZE_KB}KB" >> $GITHUB_STEP_SUMMARY
+          done
