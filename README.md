@@ -19,8 +19,7 @@ Reveal.js Präsentationen mit vollautomatischer CI/CD Pipeline - gebaut mit eine
 ├── .github/
 │   └── workflows/
 │       ├── ci.yml                          # HTML-Validierung + Link-Check
-│       ├── auto-merge.yml                  # Auto-Merge nach bestandenen Checks
-│       └── deploy-pages.yml                # GitHub Pages Deployment
+│       └── create-pr.yml                   # Auto PR + Auto-Merge
 └── EmresPräsentationMitReveal.js/
     ├── index.html                          # DOM-Präsentation
     ├── agenten.html                        # Agenten-Präsentation
@@ -32,11 +31,11 @@ Reveal.js Präsentationen mit vollautomatischer CI/CD Pipeline - gebaut mit eine
 
 ## Multi-Agenten-System
 
-Dieses Projekt wird von **6 Agenten vollautomatisch** betrieben - **kein Human-in-the-Loop**:
+Dieses Projekt wird von **5 Agenten vollautomatisch** betrieben - **kein Human-in-the-Loop**:
 
 ```
-Claude Code ──► git push ──► PR + Auto-Merge ──► CI prüft ──► GitHub merged ──► Pages Deploy
-  [1-3]              [4]                          [5]       (Branch Protection)       [6]
+Claude Code ──► git push ──► PR + Auto-Merge ──► CI prüft ──► GitHub merged ──► Pages live
+  [1-3]              [4]                          [5]       (Branch Protection)   (auto)
 ```
 
 | # | Agent | Plattform | Trigger | Konfiguration |
@@ -46,30 +45,31 @@ Claude Code ──► git push ──► PR + Auto-Merge ──► CI prüft ─
 | 3 | Deployment-Agent | Claude Code (Sub-Agent) | Vom Entwickler-Agent | Per Prompt |
 | 4 | PR + Auto-Merge-Agent | GitHub Actions | Push auf `claude/*` | `.github/workflows/create-pr.yml` |
 | 5 | CI-Agent | GitHub Actions | PR geöffnet | `.github/workflows/ci.yml` |
-| 6 | Pages-Deploy-Agent | GitHub Actions | Push auf master | `.github/workflows/deploy-pages.yml` |
+
+GitHub Pages deployt automatisch von `master` - kein extra Workflow nötig.
 
 Auto-Merge nutzt `gh pr merge --auto` und respektiert **Branch Protection Rules** - siehe [AGENTS.md](AGENTS.md).
 
-Details zu jedem Agenten, ihren Triggern, Permissions und Inspektionsmöglichkeiten: siehe [AGENTS.md](AGENTS.md).
-
 ## CI/CD Pipeline
+
+### Bei jedem Push auf `claude/*` (`create-pr.yml`)
+- Erstellt automatisch einen Pull Request
+- Aktiviert Auto-Merge (`gh pr merge --auto --squash`)
 
 ### Bei jedem Pull Request (`ci.yml`)
 - HTML-Validierung aller `.html`-Dateien
 - Link-Check: Prüft alle externen URLs auf Erreichbarkeit
 - Dateigrößen-Report
 
-### Nach bestandenen Checks (`auto-merge.yml`)
-- Automatischer Squash-Merge von `claude/*` und `dependabot/*` Branches
-- Manuelle PRs werden **nicht** auto-gemerged
-
-### Nach Merge in master (`deploy-pages.yml`)
-- Automatisches Deployment auf GitHub Pages
+### Nach bestandenen Checks
+- GitHub merged automatisch (Branch Protection + Auto-Merge)
+- GitHub Pages deployt automatisch von `master`
 
 ## Einrichtung GitHub Pages
 
-1. **Settings > Pages > Build and deployment > Source**: "GitHub Actions" auswählen
-2. Fertig - der `deploy-pages.yml` Workflow macht den Rest
+**Settings > Pages > Build and deployment > Source**: "Deploy from a branch" > Branch: `master` / Folder: `/ (root)`
+
+Das ist alles - GitHub Pages serviert statische HTML-Dateien direkt vom Branch. Kein Build-Schritt nötig.
 
 ## Lokal starten
 
@@ -86,5 +86,5 @@ npx serve .
 
 - **Reveal.js** - Präsentations-Framework
 - **GitHub Actions** - CI/CD Pipeline
-- **GitHub Pages** - Hosting
+- **GitHub Pages** - Hosting (Deploy from branch)
 - **Claude Code** - KI-gestützte Entwicklung
