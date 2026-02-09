@@ -61,4 +61,19 @@ jobs:
           echo "Aktiviere Auto-Merge fuer: $PR_URL"
 
           # --auto wartet auf Branch Protection Rules
-          gh pr merge "$PR_URL" --auto --squash || echo "Auto-Merge konnte nicht aktiviert werden. Ist 'Allow auto-merge' in Settings > General aktiviert?"
+          gh pr merge "$PR_URL" --auto --squash || echo "Auto-Merge konnte nicht aktiviert werden."
+
+      - name: HTML Checks triggern  # ← DIE MAGISCHE STEP!
+        if: steps.pr.outputs.url != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PR_NUMBER=$(basename "${{ steps.pr.outputs.url }}")
+          echo "🔄 Trigger HTML Checks fuer PR #$PR_NUMBER..."
+          
+          # Minimaler Title-Change → pull_request "edited" Event!
+          CURRENT_TITLE=$(gh pr view "$PR_NUMBER" --json title -q .title)
+          NEW_TITLE="${CURRENT_TITLE} 🔄"
+          
+          gh pr edit "$PR_NUMBER" --title "$NEW_TITLE"
+          echo "✅ Checks getriggert!"
