@@ -23,17 +23,15 @@ function textVerändern() {
       " Durch Nutzung des DOM eingefügter Text! ";
 }
 
-function bildEinfügen(){  
-            var section = document.getElementById("Überschreiben");
+function bildEinfügen(){
             var tabelle = document.getElementById("Tabelle");
             var überschrift = document.getElementById("Überschrift");
             var eigentlicheTabelle = document.getElementById("EigentlicheTabelle");
-            var bild = new Image(800, 500);
-            var anderesElement= document.createElement("p");
-    
-            bild.src="http://risovach.ru/upload/2014/09/mem/toni-stark_61830791_big_.jpeg";
-    
-            anderesElement.appendChild(bild);
+            var anderesElement = document.createElement("div");
+
+            anderesElement.style.cssText = "background:#2a6496; color:white; padding:40px; border-radius:15px; text-align:center; font-family:sans-serif;";
+            anderesElement.innerHTML = "<h2 style='margin:0 0 15px 0; font-size:2em;'>DOM erfolgreich manipuliert!</h2><p style='font-size:1.2em; margin:0;'>Die Tabelle wurde durch das DOM entfernt<br>und durch dieses Element ersetzt.</p><p style='font-size:3em; margin:15px 0 0 0;'>&#x1F389;</p>";
+
             überschrift.parentNode.replaceChild(anderesElement, überschrift);
             eigentlicheTabelle.parentNode.removeChild(eigentlicheTabelle);
             tabelle.parentNode.removeChild(tabelle);
@@ -135,9 +133,53 @@ function bildEinfügen(){
     </section>
 <section> 
             <h3>Beispielhafte DOM-Struktur <a href="http://www.mediaevent.de/javascript/dom-childnodes-parentnodes.html">[3]</a></h3>
-            <p>
-                <img src="http://www.w3schools.com/js/pic_htmltree.gif" width="900" height="600"> 
-            </p>
+            <svg width="750" height="480" viewBox="0 0 750 480" style="font-family: sans-serif; font-size: 14px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                <!-- Lines -->
+                <line x1="375" y1="45" x2="375" y2="100" stroke="#3b759e" stroke-width="2"/>
+                <line x1="375" y1="140" x2="200" y2="195" stroke="#3b759e" stroke-width="2"/>
+                <line x1="375" y1="140" x2="550" y2="195" stroke="#3b759e" stroke-width="2"/>
+                <line x1="200" y1="235" x2="200" y2="290" stroke="#3b759e" stroke-width="2"/>
+                <line x1="550" y1="235" x2="400" y2="290" stroke="#3b759e" stroke-width="2"/>
+                <line x1="550" y1="235" x2="550" y2="290" stroke="#3b759e" stroke-width="2"/>
+                <line x1="550" y1="235" x2="700" y2="290" stroke="#3b759e" stroke-width="2"/>
+                <line x1="400" y1="330" x2="400" y2="385" stroke="#3b759e" stroke-width="2"/>
+                <line x1="550" y1="330" x2="550" y2="385" stroke="#3b759e" stroke-width="2"/>
+                <line x1="550" y1="425" x2="480" y2="455" stroke="#3b759e" stroke-width="2"/>
+                <line x1="550" y1="425" x2="620" y2="455" stroke="#3b759e" stroke-width="2"/>
+                <!-- Document -->
+                <rect x="310" y="15" width="130" height="30" rx="5" fill="#2a6496" stroke="#3b759e"/>
+                <text x="375" y="36" text-anchor="middle" fill="white" font-weight="bold">Document</text>
+                <!-- HTML -->
+                <rect x="310" y="100" width="130" height="40" rx="5" fill="#3b759e" stroke="#5ba3d9"/>
+                <text x="375" y="125" text-anchor="middle" fill="white">&lt;html&gt;</text>
+                <!-- Head -->
+                <rect x="135" y="195" width="130" height="40" rx="5" fill="#4a8db5" stroke="#6db3d5"/>
+                <text x="200" y="220" text-anchor="middle" fill="white">&lt;head&gt;</text>
+                <!-- Body -->
+                <rect x="485" y="195" width="130" height="40" rx="5" fill="#4a8db5" stroke="#6db3d5"/>
+                <text x="550" y="220" text-anchor="middle" fill="white">&lt;body&gt;</text>
+                <!-- Title -->
+                <rect x="135" y="290" width="130" height="40" rx="5" fill="#5a9dc5" stroke="#7dc3e5"/>
+                <text x="200" y="315" text-anchor="middle" fill="white">&lt;title&gt;</text>
+                <!-- h1 -->
+                <rect x="335" y="290" width="130" height="40" rx="5" fill="#5a9dc5" stroke="#7dc3e5"/>
+                <text x="400" y="315" text-anchor="middle" fill="white">&lt;h1&gt;</text>
+                <!-- p -->
+                <rect x="485" y="290" width="130" height="40" rx="5" fill="#5a9dc5" stroke="#7dc3e5"/>
+                <text x="550" y="315" text-anchor="middle" fill="white">&lt;p&gt;</text>
+                <!-- a -->
+                <rect x="635" y="290" width="130" height="40" rx="5" fill="#5a9dc5" stroke="#7dc3e5"/>
+                <text x="700" y="315" text-anchor="middle" fill="white">&lt;a&gt;</text>
+                <!-- Text nodes -->
+                <rect x="335" y="385" width="130" height="30" rx="12" fill="#e8c44a" stroke="#d4a930"/>
+                <text x="400" y="405" text-anchor="middle" fill="#333" font-size="12">"Überschrift"</text>
+                <rect x="485" y="385" width="130" height="40" rx="5" fill="#5a9dc5" stroke="#7dc3e5"/>
+                <text x="550" y="410" text-anchor="middle" fill="white">&lt;a&gt;</text>
+                <rect x="415" y="445" width="130" height="30" rx="12" fill="#e8c44a" stroke="#d4a930"/>
+                <text x="480" y="465" text-anchor="middle" fill="#333" font-size="12">"Link-Text"</text>
+                <rect x="555" y="445" width="130" height="30" rx="12" fill="#98d898" stroke="#70b870"/>
+                <text x="620" y="465" text-anchor="middle" fill="#333" font-size="12">href="url"</text>
+            </svg>
         
         
         </section>
@@ -156,27 +198,114 @@ function bildEinfügen(){
                 <section><h3>Anwendungsbeispiel</h3>
                 
 <pre><code data-trim contenteditable>
-function bildEinfügen(){ 
-    var section = document.getElementById("Überschreiben");
+function bildEinfügen(){
     var tabelle = document.getElementById("Tabelle");
     var überschrift = document.getElementById("Überschrift");
     var eigentlicheTabelle = document.getElementById("EigentlicheTabelle");
-    var bild = new Image(800, 500);
-    var anderesElement= document.createElement("p");
-    
-     bild.src="http://risovach.ru/upload/2014/09/mem/toni-stark_61830791_big_.jpeg";
-    
-     anderesElement.appendChild(bild);
-     überschrift.parentNode.replaceChild(anderesElement, überschrift);
-     eigentlicheTabelle.parentNode.removeChild(eigentlicheTabelle);
-     tabelle.parentNode.removeChild(tabelle); 
-     }
+    var anderesElement = document.createElement("div");
+
+    // Neues Element erstellen und stylen
+    anderesElement.innerHTML = "&lt;h2&gt;DOM manipuliert!&lt;/h2&gt;";
+
+    // DOM-Operationen: Ersetzen und Entfernen
+    überschrift.parentNode.replaceChild(anderesElement, überschrift);
+    eigentlicheTabelle.parentNode.removeChild(eigentlicheTabelle);
+    tabelle.parentNode.removeChild(tabelle);
+}
 					</code></pre>
                 </section>
 
 <section>
 <h3>DOM-Struktur der folgenden Folie</h3>
-<iframe src="https://onedrive.live.com/embed?cid=55C3E354D2E8DB18&resid=55C3E354D2E8DB18%212275&authkey=AAIMCkR9vpqZaKI&em=2" width="800" height="600" frameborder="20" scrolling="no"></iframe>
+<svg width="800" height="520" viewBox="0 0 800 520" style="font-family: sans-serif; font-size: 13px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+    <!-- Lines Level 1 -->
+    <line x1="400" y1="45" x2="250" y2="90" stroke="#3b759e" stroke-width="2"/>
+    <line x1="400" y1="45" x2="550" y2="90" stroke="#3b759e" stroke-width="2"/>
+    <!-- Lines Level 2 left -->
+    <line x1="250" y1="125" x2="250" y2="170" stroke="#3b759e" stroke-width="2"/>
+    <!-- Lines Level 2 right (table) -->
+    <line x1="550" y1="125" x2="550" y2="170" stroke="#3b759e" stroke-width="2"/>
+    <!-- Lines Level 3 (tr rows) -->
+    <line x1="550" y1="205" x2="350" y2="250" stroke="#3b759e" stroke-width="2"/>
+    <line x1="550" y1="205" x2="550" y2="250" stroke="#3b759e" stroke-width="2"/>
+    <line x1="550" y1="205" x2="700" y2="250" stroke="#3b759e" stroke-width="2"/>
+    <!-- Lines Level 4 (th/td) -->
+    <line x1="350" y1="285" x2="300" y2="330" stroke="#3b759e" stroke-width="2"/>
+    <line x1="350" y1="285" x2="430" y2="330" stroke="#3b759e" stroke-width="2"/>
+    <line x1="550" y1="285" x2="500" y2="330" stroke="#3b759e" stroke-width="2"/>
+    <line x1="550" y1="285" x2="620" y2="330" stroke="#3b759e" stroke-width="2"/>
+    <line x1="700" y1="285" x2="660" y2="330" stroke="#3b759e" stroke-width="2"/>
+    <line x1="700" y1="285" x2="740" y2="330" stroke="#3b759e" stroke-width="2"/>
+    <!-- Lines Level 5 (text/button) -->
+    <line x1="300" y1="365" x2="300" y2="400" stroke="#3b759e" stroke-width="1.5"/>
+    <line x1="430" y1="365" x2="430" y2="400" stroke="#3b759e" stroke-width="1.5"/>
+    <line x1="500" y1="365" x2="500" y2="400" stroke="#3b759e" stroke-width="1.5"/>
+    <line x1="620" y1="365" x2="620" y2="400" stroke="#3b759e" stroke-width="1.5"/>
+    <line x1="660" y1="365" x2="660" y2="400" stroke="#3b759e" stroke-width="1.5"/>
+    <line x1="740" y1="365" x2="740" y2="400" stroke="#3b759e" stroke-width="1.5"/>
+    <!-- Section #Überschreiben -->
+    <rect x="325" y="15" width="150" height="30" rx="5" fill="#2a6496"/>
+    <text x="400" y="35" text-anchor="middle" fill="white" font-weight="bold">&lt;section&gt;</text>
+    <!-- p #Überschrift -->
+    <rect x="175" y="90" width="150" height="35" rx="5" fill="#4a8db5"/>
+    <text x="250" y="112" text-anchor="middle" fill="white">&lt;p&gt; #Überschrift</text>
+    <!-- p #Tabelle -->
+    <rect x="475" y="90" width="150" height="35" rx="5" fill="#4a8db5"/>
+    <text x="550" y="112" text-anchor="middle" fill="white">&lt;p&gt; #Tabelle</text>
+    <!-- (leer) -->
+    <rect x="195" y="170" width="110" height="25" rx="10" fill="#e8c44a"/>
+    <text x="250" y="187" text-anchor="middle" fill="#333" font-size="11">(leer)</text>
+    <!-- table -->
+    <rect x="480" y="170" width="140" height="35" rx="5" fill="#3b759e"/>
+    <text x="550" y="192" text-anchor="middle" fill="white">&lt;table&gt;</text>
+    <!-- tr 1 (header) -->
+    <rect x="290" y="250" width="120" height="35" rx="5" fill="#5a9dc5"/>
+    <text x="350" y="272" text-anchor="middle" fill="white">&lt;tr&gt;</text>
+    <!-- tr 2 -->
+    <rect x="490" y="250" width="120" height="35" rx="5" fill="#5a9dc5"/>
+    <text x="550" y="272" text-anchor="middle" fill="white">&lt;tr&gt;</text>
+    <!-- tr 3 -->
+    <rect x="640" y="250" width="120" height="35" rx="5" fill="#5a9dc5"/>
+    <text x="700" y="272" text-anchor="middle" fill="white">&lt;tr&gt;</text>
+    <!-- th Berlin -->
+    <rect x="240" y="330" width="120" height="35" rx="5" fill="#6db3d5"/>
+    <text x="300" y="352" text-anchor="middle" fill="white">&lt;th&gt; Berlin</text>
+    <!-- th Hamburg -->
+    <rect x="370" y="330" width="120" height="35" rx="5" fill="#6db3d5"/>
+    <text x="430" y="352" text-anchor="middle" fill="white">&lt;th&gt; Hamburg</text>
+    <!-- td button1 -->
+    <rect x="440" y="330" width="120" height="35" rx="5" fill="#6db3d5"/>
+    <text x="500" y="352" text-anchor="middle" fill="white">&lt;td&gt;</text>
+    <!-- td button2 -->
+    <rect x="560" y="330" width="120" height="35" rx="5" fill="#6db3d5"/>
+    <text x="620" y="352" text-anchor="middle" fill="white">&lt;td&gt;</text>
+    <!-- td button3 -->
+    <rect x="600" y="330" width="120" height="35" rx="5" fill="#6db3d5"/>
+    <text x="660" y="352" text-anchor="middle" fill="white">&lt;td&gt;</text>
+    <!-- td button4 -->
+    <rect x="680" y="330" width="120" height="35" rx="5" fill="#6db3d5"/>
+    <text x="740" y="352" text-anchor="middle" fill="white">&lt;td&gt;</text>
+    <!-- Text nodes -->
+    <rect x="245" y="400" width="110" height="25" rx="10" fill="#e8c44a"/>
+    <text x="300" y="417" text-anchor="middle" fill="#333" font-size="11">"Berlin"</text>
+    <rect x="375" y="400" width="110" height="25" rx="10" fill="#e8c44a"/>
+    <text x="430" y="417" text-anchor="middle" fill="#333" font-size="11">"Hamburg"</text>
+    <rect x="440" y="400" width="120" height="25" rx="5" fill="#98d898"/>
+    <text x="500" y="417" text-anchor="middle" fill="#333" font-size="11">&lt;button&gt; Farbe</text>
+    <rect x="560" y="400" width="120" height="25" rx="5" fill="#98d898"/>
+    <text x="620" y="417" text-anchor="middle" fill="#333" font-size="11">&lt;button&gt; Text</text>
+    <rect x="600" y="400" width="120" height="25" rx="5" fill="#98d898"/>
+    <text x="660" y="417" text-anchor="middle" fill="#333" font-size="11">&lt;button&gt; Neu</text>
+    <rect x="680" y="400" width="120" height="25" rx="5" fill="#98d898"/>
+    <text x="740" y="417" text-anchor="middle" fill="#333" font-size="11">&lt;button&gt; Ende</text>
+    <!-- Legende -->
+    <rect x="30" y="460" width="15" height="15" rx="3" fill="#4a8db5"/>
+    <text x="50" y="473" fill="#666" font-size="11">Element-Knoten</text>
+    <rect x="170" y="460" width="15" height="15" rx="8" fill="#e8c44a"/>
+    <text x="190" y="473" fill="#666" font-size="11">Text-Knoten</text>
+    <rect x="300" y="460" width="15" height="15" rx="3" fill="#98d898"/>
+    <text x="320" y="473" fill="#666" font-size="11">Button-Elemente</text>
+</svg>
 
 </section>
 					
