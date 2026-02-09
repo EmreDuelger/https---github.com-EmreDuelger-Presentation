@@ -7,9 +7,9 @@ Dieses Projekt nutzt ein Multi-Agenten-System. Jeder Agent hat eine klar definie
 ## Übersicht
 
 ```
-Push auf Branch ──► PR + Auto-Merge ──► CI prüft ──► GitHub merged ──► Pages Deploy
-     [1]                [4]               [5]        (Branch Protection)      [6]
-  Claude Code      create-pr.yml        ci.yml       gh pr merge --auto   deploy-pages.yml
+Push auf Branch ──► PR + Auto-Merge ──► CI prüft ──► GitHub merged ──► Pages live
+     [1]                [4]               [5]        (Branch Protection)   (auto)
+  Claude Code      create-pr.yml        ci.yml       gh pr merge --auto  Deploy from branch
 ```
 
 Alle Schritte laufen **vollautomatisch** - kein Human-in-the-Loop.
@@ -181,42 +181,18 @@ permissions:
 
 ---
 
-## Agent 6: Pages-Deploy-Agent (GitHub Actions)
+## GitHub Pages (kein Agent - eingebaute GitHub-Funktion)
 
 | Eigenschaft | Wert |
 |-------------|------|
-| **Plattform** | GitHub Actions |
-| **Trigger** | `push` auf `master` oder `main` |
-| **Aufgabe** | Automatisches Deployment auf GitHub Pages |
-| **Konfiguration** | `.github/workflows/deploy-pages.yml` |
+| **Plattform** | GitHub Pages (nativ) |
+| **Trigger** | Push auf `master` |
+| **Aufgabe** | Statische HTML-Dateien direkt vom Branch servieren |
+| **Konfiguration** | Settings > Pages > "Deploy from a branch" |
 
-### Was er macht
-1. Checkt den Code aus
-2. Konfiguriert GitHub Pages
-3. Lädt das gesamte Repo als Artifact hoch
-4. Deployt auf GitHub Pages
-5. Schreibt die Live-URLs in die Step Summary
-
-### Wo konfiguriert
-```
-.github/workflows/deploy-pages.yml
-```
-
-### So inspizierst du die Einstellungen
-```bash
-cat .github/workflows/deploy-pages.yml
-
-# Auf GitHub: Actions Tab → "Deploy GitHub Pages"
-# Environment: Settings → Environments → "github-pages"
-```
-
-### Permissions
-```yaml
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-```
+### Warum kein Workflow?
+Für reine HTML/CSS/JS-Dateien (wie Reveal.js Präsentationen) braucht man keinen Build-Schritt.
+GitHub Pages kann die Dateien direkt vom Branch servieren - einfacher, schneller, weniger Fehlerquellen.
 
 ---
 
@@ -265,7 +241,8 @@ Damit die Pipeline korrekt funktioniert, muss **Branch Protection** auf `master`
 
 | Einstellung | Wert | Warum |
 |-------------|------|-------|
-| **Source** | GitHub Actions | Deploy-Agent übernimmt das Deployment |
+| **Source** | Deploy from a branch | Statische Dateien direkt von `master` servieren |
+| **Branch** | `master` / `/ (root)` | Gesamtes Repo wird als Website bereitgestellt |
 
 ### So prüfst du die Branch Protection
 ```bash
@@ -295,10 +272,9 @@ Du (Prompt)
 │  GitHub Actions                              │
 │  ├── PR + Auto-Merge (create-pr.yml)         │  Agent 4
 │  │     └── gh pr merge --auto --squash       │
-│  ├── CI-Agent (ci.yml)                       │  Agent 5
-│  │     ├── HTML Validierung                  │
-│  │     └── Link-Check                        │
-│  └── Pages-Deploy (deploy-pages.yml)         │  Agent 6
+│  └── CI-Agent (ci.yml)                       │  Agent 5
+│        ├── HTML Validierung                  │
+│        └── Link-Check                        │
 └──────────┬───────────────────────────────────┘
            │
            ▼
@@ -306,18 +282,19 @@ Du (Prompt)
 │  Branch Protection (GitHub)                  │
 │  ├── Required status checks müssen bestehen  │
 │  ├── Auto-Merge wartet auf grünes Licht      │
-│  └── Merge → Push auf master → Deploy        │
+│  └── Merge → Push auf master                 │
 └──────────┬───────────────────────────────────┘
            │
            ▼
-┌──────────────────────────────────┐
-│  GitHub Pages (Live)             │
-│  └── Präsentationen online       │
-└──────────────────────────────────┘
+┌──────────────────────────────────────────────┐
+│  GitHub Pages (Deploy from branch)           │
+│  └── Serviert statische Dateien von master   │
+└──────────────────────────────────────────────┘
 ```
 
 **Kein Human-in-the-Loop** - der gesamte Flow von Push bis Live-Seite ist vollautomatisch.
 Branch Protection stellt sicher, dass nur geprüfter Code auf master landet.
+GitHub Pages braucht keinen Workflow - es serviert die Dateien direkt vom Branch.
 
 ---
 
@@ -327,6 +304,5 @@ Branch Protection stellt sicher, dass nur geprüfter Code auf master landet.
 |-------|-------|-------------|
 | `.github/workflows/create-pr.yml` | PR + Auto-Merge (#4) | PR erstellen + Auto-Merge aktivieren |
 | `.github/workflows/ci.yml` | CI-Agent (#5) | HTML-Validierung + Link-Check |
-| `.github/workflows/deploy-pages.yml` | Pages-Deploy-Agent (#6) | Deployment auf GitHub Pages |
 | `CLAUDE.md` (optional) | Entwickler-Agent (#1) | Projektspezifische Anweisungen für Claude |
 | `.coderabbit.yaml` (optional) | CodeRabbit | Review-Konfiguration |
