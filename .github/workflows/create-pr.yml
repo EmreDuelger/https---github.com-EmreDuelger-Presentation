@@ -58,22 +58,20 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           PR_URL="${{ steps.pr.outputs.url }}"
-          echo "Aktiviere Auto-Merge fuer: $PR_URL"
+          PR_NUMBER=$(basename "$PR_URL")
+          echo "Aktiviere Auto-Merge fuer PR #$PR_NUMBER: $PR_URL"
 
           # --auto wartet auf Branch Protection Rules
-          gh pr merge "$PR_URL" --auto --squash || echo "Auto-Merge konnte nicht aktiviert werden."
+          gh pr merge "$PR_URL" --auto --squash || echo "Auto-Merge konnte nicht aktiviert werden. Ist 'Allow auto-merge' aktiviert?"
 
-      - name: HTML Checks triggern  # ← DIE MAGISCHE STEP!
+      - name: Checks manuell triggern  # ← DIE MAGISCHE STEP!
         if: steps.pr.outputs.url != ''
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           PR_NUMBER=$(basename "${{ steps.pr.outputs.url }}")
-          echo "🔄 Trigger HTML Checks fuer PR #$PR_NUMBER..."
+          echo "🔄 Trigger alle Checks fuer PR #$PR_NUMBER..."
           
-          # Minimaler Title-Change → pull_request "edited" Event!
-          CURRENT_TITLE=$(gh pr view "$PR_NUMBER" --json title -q .title)
-          NEW_TITLE="${CURRENT_TITLE} 🔄"
-          
-          gh pr edit "$PR_NUMBER" --title "$NEW_TITLE"
-          echo "✅ Checks getriggert!"
+          # Re-run ALLE Checks für diesen PR
+          gh pr checks "$PR_NUMBER" --rerun
+          echo "✅ Alle Checks getriggert! Auto-Merge wartet..."
