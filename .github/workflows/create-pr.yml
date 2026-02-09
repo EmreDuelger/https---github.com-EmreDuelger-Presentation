@@ -32,29 +32,23 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          # Commits seit master sammeln
-          COMMITS=$(git log origin/master..HEAD --pretty=format:"- %s" 2>/dev/null || echo "- Neue Änderungen")
-
-          # PR-Titel aus Branch-Name ableiten
           BRANCH="${{ github.ref_name }}"
-          TITLE=$(echo "$BRANCH" | sed 's|claude/||' | sed 's|-| |g' | sed 's/\b\(.\)/\u\1/g')
+          TITLE=$(echo "$BRANCH" | sed 's|claude/||' | sed 's|-| |g')
+          COMMITS=$(git log origin/master..HEAD --pretty=format:"- %s" 2>/dev/null || echo "- Neue Aenderungen")
+
+          BODY="## Automatisch erstellter PR"
+          BODY="$BODY\n\nBranch: \`$BRANCH\`"
+          BODY="$BODY\n\n### Commits\n$COMMITS"
+          BODY="$BODY\n\n### Pipeline"
+          BODY="$BODY\n- [ ] CI-Agent: HTML-Validierung + Link-Check"
+          BODY="$BODY\n- [ ] Auto-Merge nach bestandenen Checks"
+          BODY="$BODY\n- [ ] Pages-Deploy nach Merge"
+
+          echo -e "$BODY" > /tmp/pr-body.md
 
           gh pr create \
             --base master \
             --title "$TITLE" \
-            --body "$(cat <<EOF
-## Automatisch erstellter PR
+            --body-file /tmp/pr-body.md
 
-Branch: \`$BRANCH\`
-
-### Commits
-$COMMITS
-
-### Pipeline
-- [ ] CI-Agent: HTML-Validierung + Link-Check
-- [ ] Auto-Merge nach bestandenen Checks
-- [ ] Pages-Deploy nach Merge
-EOF
-)"
-
-          echo "PR erstellt für Branch: $BRANCH"
+          echo "PR erstellt fuer Branch: $BRANCH"
