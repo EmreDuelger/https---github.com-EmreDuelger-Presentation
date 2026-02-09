@@ -61,17 +61,27 @@ jobs:
           PR_NUMBER=$(basename "$PR_URL")
           echo "Aktiviere Auto-Merge fuer PR #$PR_NUMBER: $PR_URL"
 
-          # --auto wartet auf Branch Protection Rules
           gh pr merge "$PR_URL" --auto --squash || echo "Auto-Merge konnte nicht aktiviert werden. Ist 'Allow auto-merge' aktiviert?"
 
-      - name: Checks manuell triggern  # ← DIE MAGISCHE STEP!
+      - name: Checks triggern via Empty Commit
         if: steps.pr.outputs.url != ''
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           PR_NUMBER=$(basename "${{ steps.pr.outputs.url }}")
-          echo "🔄 Trigger alle Checks fuer PR #$PR_NUMBER..."
+          BRANCH=$(gh pr view "$PR_NUMBER" --json headRefName -q .headRefName)
           
-          # Re-run ALLE Checks für diesen PR
-          gh pr checks "$PR_NUMBER" --rerun
-          echo "✅ Alle Checks getriggert! Auto-Merge wartet..."
+          echo "🔄 Trigger Checks für PR #$PR_NUMBER auf Branch $BRANCH..."
+          
+          # Checkout PR Branch
+          git fetch origin "$BRANCH"
+          git checkout "$BRANCH"
+          
+          # Empty Commit triggert pull_request synchronize Event!
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit --allow-empty -m "🤖 Trigger checks"
+          git push origin "$BRANCH"
+          
+          echo "✅ Checks getriggert! Auto-Merge wartet auf grüne Checks..."
+
